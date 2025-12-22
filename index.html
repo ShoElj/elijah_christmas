@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elijah Christmas Wishlist Wheel</title>
+  <style>
+    body {
+      font-family: system-ui, Arial;
+      margin: 0;
+      padding: 24px;
+      background: #0b1220;
+      color: #e9eefc;
+    }
+
+    body:before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255, 255, 255, .10), transparent 30%),
+        radial-gradient(circle at 80% 20%, rgba(34, 197, 94, .12), transparent 35%),
+        radial-gradient(circle at 50% 80%, rgba(245, 158, 11, .10), transparent 40%);
+      pointer-events: none;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 460px 1fr;
+    }
+
+    @media (max-width: 980px) {
+      .wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 16px;
+      padding: 16px;
+      backdrop-filter: blur(6px);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .muted {
+      opacity: .85;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .err {
+      margin-top: 10px;
+      color: #fca5a5;
+      font-size: 13px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px 14px;
+      border: 0;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .btn {
+      background: #22c55e;
+      color: #07110a;
+    }
+
+    .btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .btn2 {
+      margin-top: 10px;
+      background: rgba(255, 255, 255, .12);
+      color: #e9eefc;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .row button {
+      width: 50%;
+    }
+
+    .wheelBox {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 460px;
+    }
+
+    canvas {
+      width: 420px;
+      height: 420px;
+    }
+
+    .pointer {
+      position: absolute;
+      top: 18px;
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 24px solid #f59e0b;
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .4));
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, .16);
+      border: 1px solid rgba(245, 158, 11, .35);
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      background: rgba(0, 0, 0, .25);
+      color: #e9eefc;
+      margin-top: 10px;
+      font-family: inherit;
+    }
+
+    textarea {
+      min-height: 180px;
+      font-family: ui-monospace, Menlo, monospace;
+    }
+
+    .sectionBox {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(0, 0, 0, .18);
+    }
+
+    .miniTitle {
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .smallNote {
+      font-size: 12px;
+      opacity: .8;
+    }
+
+    /* WhatsApp button style */
+    .waBtn {
+      background: rgba(34, 197, 94, .18);
+      border: 1px solid rgba(34, 197, 94, .35);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>🎄 Wishlist Wheel</h1>
+      <div class="muted">
+        Spin the wheel to pick a gift. Confirm to remove it <b>on this device</b>.
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn2" id="reloadBtn">Reload list</button>
+        <button class="btn" id="spinBtn" disabled>SPIN</button>
+      </div>
+
+      <button class="btn2" id="resetBtn">Reset reservations (this device)</button>
+
+      <details style="margin-top:12px;">
+        <summary class="muted" style="cursor:pointer;">Edit wishlist (advanced)</summary>
+        <div class="muted" style="margin-top:8px;">
+          Only you should use this. Paste JSON array and click <b>Load JSON</b>.
+        </div>
+        <textarea id="jsonBox" spellcheck="false"></textarea>
+        <button class="btn2" id="loadBtn">Load JSON</button>
+        <div class="smallNote">Tip: items can include {"type":"funds"} for money gifts.</div>
+      </details>
+
+      <div id="winner" style="margin-top:14px;"></div>
+      <div class="err" id="err"></div>
+    </div>
+
+    <div class="card">
+      <div class="wheelBox">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="wheel" width="900" height="900"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const jsonBox = document.getElementById("jsonBox");
+    const loadBtn = document.getElementById("loadBtn");
+    const spinBtn = document.getElementById("spinBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const reloadBtn = document.getElementById("reloadBtn");
+    const winnerEl = document.getElementById("winner");
+    const errEl = document.getElementById("err");
+
+    const RES_KEY = "wishlist_reserved_local_v1";
+
+    function loadReserved() {
+      try { return JSON.parse(localStorage.getItem(RES_KEY) || "{}"); }
+      catch { return {}; }
+    }
+    function saveReserved(map) {
+      localStorage.setItem(RES_KEY, JSON.stringify(map));
+    }
+    function escapeHtml(s) {
+      return String(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    }
+
+    // ====== BANK SETTINGS ======
+    const BANK_NAME = "OPAY";
+    const ACCOUNT_NAME = "SHODIPO ELIJAH AYOKUNUMI";
+    const ACCOUNT_NUMBER_FULL = "9073504197";
+
+    const SHOW_MASKED_ON_SCREEN = true;
+    const ACCOUNT_NUMBER_DISPLAY = SHOW_MASKED_ON_SCREEN
+      ? ACCOUNT_NUMBER_FULL.replace(/^(\d{2})\d+(\d{2})$/, "$1****$2")
+      : ACCOUNT_NUMBER_FULL;
+
+    // ====== DEFAULT WISHLIST ======
+    const DEFAULT_WISHLIST = [
+      { id: "mac_m3_bag", name: "MacBook M3 + Laptop Bag", type: "item", url: "", price: "" },
+      { id: "s21_ultra", name: "Samsung Galaxy S21 Ultra", type: "item", url: "", price: "" },
+      { id: "funds_ngx", name: "Funds to buy NGX stocks (large amount)", type: "funds", url: "", price: "" },
+      { id: "tees_accessories", name: "Couple of T-shirts + Accessories", type: "item", url: "", price: "" },
+      { id: "jordan_loafers_slide", name: "Jordan Loafers + Nike Slide", type: "item", url: "", price: "" },
+      { id: "baseball_hat", name: "Baseball Hat", type: "item", url: "", price: "" },
+      { id: "funds_bank", name: "Funds in bank", type: "funds", url: "", price: "" }
+    ];
+
+    jsonBox.value = JSON.stringify(DEFAULT_WISHLIST, null, 2);
+
+    let allItems = [];
+    let items = [];
+    let angle = 0;
+    let spinning = false;
+
+    function randomColor(i) {
+      const hue = (i * 47) % 360;
+      return `hsl(${hue}, 70%, 55%)`;
+    }
+
+    function rebuildAvailable() {
+      const reserved = loadReserved();
+      items = allItems.filter(it => !reserved[it.id]);
+      spinBtn.disabled = items.length < 2;
+      drawWheel();
+    }
+
+    function drawWheel() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const radius = Math.min(cx, cy) - 30;
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius + 10, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      ctx.fill();
+
+      if (items.length < 2) {
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.font = "30px system-ui";
+        ctx.textAlign = "center";
+        const msg = allItems.length ? "All items reserved ✅" : "Reload list →";
+        ctx.fillText(msg, cx, cy);
+        return;
+      }
+
+      const slice = (Math.PI * 2) / items.length;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+
+      for (let i = 0; i < items.length; i++) {
+        const start = i * slice;
+        const end = start + slice;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, start, end);
+        ctx.closePath();
+        ctx.fillStyle = randomColor(i);
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(0,0,0,0.25)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.rotate(start + slice / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "rgba(0,0,0,0.88)";
+        ctx.font = "900 24px system-ui";
+        ctx.fillText(items[i].name.slice(0, 24), radius - 18, 10);
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 85, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(11,18,32,0.92)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.18)";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.font = "900 22px system-ui";
+      ctx.textAlign = "center";
+      ctx.fillText("SPIN", 0, 8);
+
+      ctx.restore();
+    }
+
+    function loadJSON(fromTextArea = true) {
+      errEl.textContent = "";
+      winnerEl.innerHTML = "";
+      try {
+        const parsed = fromTextArea ? JSON.parse(jsonBox.value) : DEFAULT_WISHLIST;
+        if (!Array.isArray(parsed)) throw new Error("JSON must be an array.");
+
+        const cleaned = parsed.map((x, idx) => ({
+          id: String(x?.id ?? `item_${idx}`).trim(),
+          name: String(x?.name ?? "").trim(),
+          url: String(x?.url ?? "").trim(),
+          price: String(x?.price ?? "").trim(),
+          type: String(x?.type ?? "item").trim()
+        })).filter(x => x.id && x.name).slice(0, 80);
+
+        if (cleaned.length < 2) throw new Error("Add at least 2 items with id + name.");
+
+        allItems = cleaned;
+        angle = 0;
+        rebuildAvailable();
+      } catch (e) {
+        allItems = [];
+        items = [];
+        spinBtn.disabled = true;
+        drawWheel();
+        errEl.textContent = "Error: " + (e?.message || "Invalid JSON.");
+      }
+    }
+
+    function pickWinner(finalAngle) {
+      const slice = (Math.PI * 2) / items.length;
+      const pointerAngle = (Math.PI * 3) / 2;
+      const normalized = (pointerAngle - (finalAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+      return items[Math.floor(normalized / slice)];
+    }
+
+    // WhatsApp integration
+    function openWhatsAppShare(text) {
+      const url = "https://wa.me/?text=" + encodeURIComponent(text);
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+
+    function buildWhatsAppMessage({ itemName, giverName, giverMsg }) {
+      const lines = [];
+      lines.push("🎄 *Christmas Wishlist Spin*");
+      lines.push(`🎁 *Result:* ${itemName}`);
+      lines.push("");
+      lines.push("💸 *Gift/Transfer Details:*");
+      lines.push(`Bank: ${BANK_NAME}`);
+      lines.push(`Account Name: ${ACCOUNT_NAME}`);
+      lines.push(`Account No: ${ACCOUNT_NUMBER_FULL}`);
+      if (giverName) {
+        lines.push("");
+        lines.push(`✅ *From:* ${giverName}`);
+      }
+      if (giverMsg) {
+        lines.push(`💬 *Message:* ${giverMsg}`);
+      }
+      return lines.join("\n");
+    }
+
+    function showConfirmUI(w) {
+      const safeName = escapeHtml(w.name);
+      const isFunds = (w.type === "funds");
+
+      winnerEl.innerHTML = `
+      <div style="font-weight:900;font-size:16px;">🎁 Winner: <span class="pill">${safeName}</span></div>
+
+      ${isFunds ? `
+        <div class="muted" style="margin-top:10px;">This one is a <b>Funds gift</b>. You can transfer below.</div>
+      ` : `
+        <div class="muted" style="margin-top:10px;">If you prefer sending cash instead of buying the item, use the bank option.</div>
+      `}
+
+      <!-- ✅ WhatsApp always visible -->
+      <button class="btn2 waBtn" id="waShareBtn" style="margin-top:10px;">Share to WhatsApp</button>
+      <div class="smallNote">Share the result + bank details to WhatsApp.</div>
+
+      <button class="btn2" id="revealBankBtn" style="margin-top:10px;">Reveal bank details</button>
+
+      <div id="bankBox" class="sectionBox" style="display:none;">
+        <div class="miniTitle">💸 Transfer Details</div>
+        <div class="muted">Bank: <b>${escapeHtml(BANK_NAME)}</b></div>
+        <div class="muted">Account Name: <b>${escapeHtml(ACCOUNT_NAME)}</b></div>
+        <div class="muted">Account No: <b>${escapeHtml(ACCOUNT_NUMBER_DISPLAY)}</b></div>
+
+        <div class="row">
+          <button class="btn2" id="copyAccBtn">Copy Account No</button>
+          <button class="btn2" id="copyAllBtn">Copy Full Details</button>
+        </div>
+      </div>
+
+      <div class="muted" style="margin-top:14px;">Confirm to remove it from this wheel on this device:</div>
+      <input id="giverName" placeholder="Your name (required)" />
+      <input id="giverMsg" placeholder="Message (optional)" />
+
+      <button class="btn" id="confirmBtn" style="margin-top:10px;">✅ Confirm I’ll get this</button>
+      <button class="btn2" id="cancelBtn">No, spin again</button>
+    `;
+
+      const revealBtn = document.getElementById("revealBankBtn");
+      const bankBox = document.getElementById("bankBox");
+      if (revealBtn && bankBox) {
+        revealBtn.onclick = () => {
+          bankBox.style.display = (bankBox.style.display === "none") ? "block" : "none";
+        };
+      }
+
+      const copyAccBtn = document.getElementById("copyAccBtn");
+      const copyAllBtn = document.getElementById("copyAllBtn");
+
+      if (copyAccBtn) {
+        copyAccBtn.onclick = async () => {
+          await navigator.clipboard.writeText(ACCOUNT_NUMBER_FULL);
+          copyAccBtn.textContent = "Copied ✅";
+          setTimeout(() => copyAccBtn.textContent = "Copy Account No", 1200);
+        };
+      }
+
+      if (copyAllBtn) {
+        copyAllBtn.onclick = async () => {
+          const details = `Bank: ${BANK_NAME}\nAccount Name: ${ACCOUNT_NAME}\nAccount No: ${ACCOUNT_NUMBER_FULL}`;
+          await navigator.clipboard.writeText(details);
+          copyAllBtn.textContent = "Copied ✅";
+          setTimeout(() => copyAllBtn.textContent = "Copy Full Details", 1200);
+        };
+      }
+
+      // WhatsApp click handler
+      const waBtn = document.getElementById("waShareBtn");
+      if (waBtn) {
+        waBtn.onclick = () => {
+          const giverName = (document.getElementById("giverName")?.value || "").trim();
+          const giverMsg = (document.getElementById("giverMsg")?.value || "").trim();
+          const msg = buildWhatsAppMessage({ itemName: w.name, giverName, giverMsg });
+          openWhatsAppShare(msg);
+        };
+      }
+
+      document.getElementById("cancelBtn").onclick = () => {
+        winnerEl.innerHTML = "";
+      };
+
+      document.getElementById("confirmBtn").onclick = () => {
+        const name = document.getElementById("giverName").value.trim();
+        const msg = document.getElementById("giverMsg").value.trim();
+        if (!name) { alert("Please enter your name."); return; }
+
+        const reserved = loadReserved();
+        reserved[w.id] = { by: name, msg, at: Date.now() };
+        saveReserved(reserved);
+
+        rebuildAvailable();
+
+        winnerEl.innerHTML = `
+        <div style="font-weight:900;font-size:16px;">✅ Confirmed: <span class="pill">${safeName}</span></div>
+        <div class="muted" style="margin-top:6px;">By <b>${escapeHtml(name)}</b>${msg ? ` — “${escapeHtml(msg)}”` : ""}</div>
+        <div class="muted" style="margin-top:6px;">(Saved on this device)</div>
+      `;
+      };
+    }
+
+    function confettiPop() {
+      const n = 120;
+      const el = document.createElement("div");
+      el.style.position = "fixed";
+      el.style.left = "0";
+      el.style.top = "0";
+      el.style.width = "100%";
+      el.style.height = "100%";
+      el.style.pointerEvents = "none";
+      document.body.appendChild(el);
+
+      for (let i = 0; i < n; i++) {
+        const p = document.createElement("div");
+        p.style.position = "absolute";
+        p.style.width = "8px";
+        p.style.height = "8px";
+        p.style.left = (50 + (Math.random() * 20 - 10)) + "vw";
+        p.style.top = "20vh";
+        p.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
+        p.style.transform = `rotate(${Math.random() * 360}deg)`;
+        p.style.borderRadius = Math.random() > 0.5 ? "2px" : "999px";
+        p.style.transition = "transform 1.2s ease, top 1.2s ease, left 1.2s ease, opacity 1.2s ease";
+        el.appendChild(p);
+
+        requestAnimationFrame(() => {
+          p.style.left = (Math.random() * 100) + "vw";
+          p.style.top = (60 + Math.random() * 40) + "vh";
+          p.style.transform = `rotate(${Math.random() * 720}deg) scale(${0.6 + Math.random()})`;
+          p.style.opacity = "0";
+        });
+      }
+      setTimeout(() => el.remove(), 1400);
+    }
+
+    function spin() {
+      if (spinning || items.length < 2) return;
+      spinning = true;
+      spinBtn.disabled = true;
+      winnerEl.innerHTML = "";
+      errEl.textContent = "";
+
+      const spins = 6 + Math.random() * 5;
+      const target = angle + spins * Math.PI * 2 + Math.random() * Math.PI * 2;
+
+      const start = performance.now();
+      const duration = 4200 + Math.random() * 900;
+      const initial = angle;
+
+      function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+      function frame(now) {
+        const t = Math.min(1, (now - start) / duration);
+        angle = initial + (target - initial) * easeOutCubic(t);
+        drawWheel();
+
+        if (t < 1) requestAnimationFrame(frame);
+        else {
+          const w = pickWinner(angle);
+          showConfirmUI(w);
+          confettiPop();
+          spinning = false;
+          spinBtn.disabled = items.length < 2;
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    // Events
+    resetBtn.addEventListener("click", () => {
+      localStorage.removeItem(RES_KEY);
+      winnerEl.innerHTML = "";
+      rebuildAvailable();
+    });
+    loadBtn.addEventListener("click", () => loadJSON(true));
+    reloadBtn.addEventListener("click", () => loadJSON(false));
+    spinBtn.addEventListener("click", spin);
+
+    // Start
+    drawWheel();
+    loadJSON(false);
+  </script>
+</body>
+
+</html>
