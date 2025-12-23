@@ -4,14 +4,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Elijah Christmas Wishlist Wheel</title>
+  <title>Wishlist Wheel</title>
   <style>
+    :root {
+      --bg: #0b1220;
+      --card: rgba(255, 255, 255, .06);
+      --border: rgba(255, 255, 255, .12);
+      --text: #e9eefc;
+      --muted: rgba(233, 238, 252, .85);
+      --accent: #22c55e;
+      --warn: #f59e0b;
+      --danger: #fb7185;
+      --shadow: 0 18px 60px rgba(0, 0, 0, .55);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: system-ui, Arial;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
       margin: 0;
-      padding: 24px;
-      background: #0b1220;
-      color: #e9eefc;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
     }
 
     body:before {
@@ -26,36 +43,58 @@
     }
 
     .wrap {
-      max-width: 1100px;
+      max-width: 1120px;
       margin: 0 auto;
       display: grid;
-      gap: 18px;
-      grid-template-columns: 460px 1fr;
+      gap: 14px;
+      grid-template-columns: 420px 1fr;
+      align-items: start;
     }
 
     @media (max-width: 980px) {
+      body {
+        padding: 12px;
+      }
+
       .wrap {
         grid-template-columns: 1fr;
       }
     }
 
     .card {
-      background: rgba(255, 255, 255, .06);
-      border: 1px solid rgba(255, 255, 255, .12);
-      border-radius: 16px;
-      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
       backdrop-filter: blur(6px);
     }
 
     h1 {
-      margin: 0 0 8px;
-      font-size: 22px;
+      margin: 0 0 6px;
+      font-size: 20px;
+      letter-spacing: .2px;
     }
 
     .muted {
-      opacity: .85;
+      opacity: .88;
       font-size: 13px;
       line-height: 1.35;
+    }
+
+    .tiny {
+      opacity: .75;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .hint {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(0, 0, 0, .16);
+      font-size: 12px;
+      opacity: .95;
     }
 
     .err {
@@ -64,18 +103,57 @@
       font-size: 13px;
     }
 
+    .topBadge {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .10);
+      border: 1px solid rgba(255, 255, 255, .14);
+    }
+
+    .badge b {
+      opacity: .95;
+    }
+
+    .badge.warn {
+      background: rgba(245, 158, 11, .14);
+      border-color: rgba(245, 158, 11, .30);
+    }
+
+    .badge.ok {
+      background: rgba(34, 197, 94, .14);
+      border-color: rgba(34, 197, 94, .30);
+    }
+
     button {
       width: 100%;
       padding: 12px 14px;
       border: 0;
       border-radius: 12px;
       cursor: pointer;
-      font-weight: 800;
+      font-weight: 900;
+      font-size: 14px;
+      color: var(--text);
+      background: rgba(255, 255, 255, .12);
+      border: 1px solid rgba(255, 255, 255, .10);
     }
 
     .btn {
-      background: #22c55e;
+      background: var(--accent);
       color: #07110a;
+      border: 0;
     }
 
     .btn:disabled {
@@ -84,9 +162,17 @@
     }
 
     .btn2 {
-      margin-top: 10px;
-      background: rgba(255, 255, 255, .12);
-      color: #e9eefc;
+      background: rgba(255, 255, 255, .10);
+    }
+
+    .dangerBtn {
+      background: rgba(251, 113, 133, .14);
+      border-color: rgba(251, 113, 133, .28);
+    }
+
+    .waBtn {
+      background: rgba(34, 197, 94, .16);
+      border-color: rgba(34, 197, 94, .30);
     }
 
     .row {
@@ -99,36 +185,14 @@
       width: 50%;
     }
 
-    .wheelBox {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 460px;
-    }
+    @media (max-width:520px) {
+      .row {
+        flex-direction: column;
+      }
 
-    canvas {
-      width: 420px;
-      height: 420px;
-    }
-
-    .pointer {
-      position: absolute;
-      top: 18px;
-      width: 0;
-      height: 0;
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-top: 24px solid #f59e0b;
-      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .4));
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(245, 158, 11, .16);
-      border: 1px solid rgba(245, 158, 11, .35);
+      .row button {
+        width: 100%;
+      }
     }
 
     input,
@@ -138,18 +202,25 @@
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, .14);
       background: rgba(0, 0, 0, .25);
-      color: #e9eefc;
+      color: var(--text);
       margin-top: 10px;
       font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: rgba(245, 158, 11, .45);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, .08);
     }
 
     textarea {
-      min-height: 180px;
-      font-family: ui-monospace, Menlo, monospace;
+      min-height: 130px;
     }
 
     .sectionBox {
-      margin-top: 10px;
+      margin-top: 12px;
       padding: 12px;
       border-radius: 14px;
       border: 1px solid rgba(255, 255, 255, .12);
@@ -157,140 +228,668 @@
     }
 
     .miniTitle {
-      font-weight: 900;
+      font-weight: 950;
       margin-bottom: 6px;
     }
 
-    .smallNote {
-      font-size: 12px;
-      opacity: .8;
+    .divider {
+      height: 1px;
+      background: rgba(255, 255, 255, .12);
+      margin: 12px 0;
     }
 
-    /* WhatsApp button style */
-    .waBtn {
-      background: rgba(34, 197, 94, .18);
-      border: 1px solid rgba(34, 197, 94, .35);
+    details summary {
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .summaryRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(0, 0, 0, .12);
+      margin-top: 12px;
+    }
+
+    .chev {
+      opacity: .75;
+      font-weight: 900;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width:520px) {
+      .grid2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Wheel */
+    .wheelCard {
+      padding: 14px;
+      min-height: 520px;
+    }
+
+    .wheelBox {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      min-height: 480px;
+    }
+
+    @media (max-width:980px) {
+      .wheelCard {
+        min-height: 420px;
+      }
+
+      .wheelBox {
+        min-height: 380px;
+      }
+    }
+
+    canvas {
+      width: min(92vw, 520px);
+      height: min(92vw, 520px);
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    .pointer {
+      position: absolute;
+      top: 18px;
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 24px solid var(--warn);
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45));
+    }
+
+    .wheelHint {
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* Modal */
+    .modalBackdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      z-index: 50;
+    }
+
+    .modalBackdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(720px, 100%);
+      background: rgba(18, 26, 46, .92);
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .modalHeader {
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, .10);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .modalTitle {
+      font-weight: 950;
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .closeX {
+      width: auto;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .10);
+      border: 1px solid rgba(255, 255, 255, .12);
+      cursor: pointer;
+      font-weight: 950;
+    }
+
+    .modalBody {
+      padding: 14px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, .16);
+      border: 1px solid rgba(245, 158, 11, .35);
+      font-weight: 900;
+    }
+
+    .modalActions {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .bankBox {
+      display: none;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(0, 0, 0, .20);
+    }
+
+    .bankGrid {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .copyRow {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .copyRow button {
+      width: 50%;
+    }
+
+    @media (max-width:520px) {
+      .copyRow {
+        flex-direction: column;
+      }
+
+      .copyRow button {
+        width: 100%;
+      }
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, .65);
+      border: 1px solid rgba(255, 255, 255, .14);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 60;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
+    <!-- Left -->
     <div class="card">
-      <h1>🎄 Wishlist Wheel</h1>
-      <div class="muted">
-        Spin the wheel to pick a gift. Confirm to remove it <b>on this device</b>.
+      <h1 id="pageTitle">🎄 Wishlist Wheel</h1>
+      <div class="muted" id="pageSubtitle">
+        Spin to select a gift for the owner. This is <b>NOT</b> a giveaway.
       </div>
 
-      <div class="row" style="margin-top:12px;">
-        <button class="btn2" id="reloadBtn">Reload list</button>
-        <button class="btn" id="spinBtn" disabled>SPIN</button>
+      <div class="topBadge">
+        <span class="badge warn">⚠️ <b>Not a giveaway</b> selects a gift for Elijah </span>
+        <span class="badge ok">✅ <b>One spin</b> per wheel link (this device)</span>
       </div>
 
-      <button class="btn2" id="resetBtn">Reset reservations (this device)</button>
+      <div class="sectionBox">
+        <div class="miniTitle">🧑 Your Name</div>
+        <div class="tiny">Enter your name to unlock spinning.</div>
+        <input id="spinnerName" placeholder="Enter your name…" />
+        <div id="spinStatus" class="hint">Tip: After spinning, share the result to WhatsApp so the owner sees what you
+          picked.</div>
 
-      <details style="margin-top:12px;">
-        <summary class="muted" style="cursor:pointer;">Edit wishlist (advanced)</summary>
-        <div class="muted" style="margin-top:8px;">
-          Only you should use this. Paste JSON array and click <b>Load JSON</b>.
+        <div class="row">
+          <button class="btn2" id="reloadBtn">Reload list</button>
+          <button class="btn" id="spinBtn" disabled>SPIN</button>
         </div>
-        <textarea id="jsonBox" spellcheck="false"></textarea>
-        <button class="btn2" id="loadBtn">Load JSON</button>
-        <div class="smallNote">Tip: items can include {"type":"funds"} for money gifts.</div>
-      </details>
 
-      <div id="winner" style="margin-top:14px;"></div>
+        <details style="margin-top:12px;">
+          <summary class="summaryRow">
+            <span class="muted" style="font-weight:900;">Troubleshooting (optional)</span>
+            <span class="chev">⌄</span>
+          </summary>
+          <div class="sectionBox" style="margin-top:10px;">
+            <div class="tiny">These only affect <b>this device</b>.</div>
+            <div class="row">
+              <button class="btn2" id="clearSpinBtn">Reset my spin (this wheel)</button>
+              <button class="btn2 dangerBtn" id="resetReservationsBtn">Reset reservations (this wheel)</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
       <div class="err" id="err"></div>
+
+      <!-- Create wheel -->
+      <details>
+        <summary class="summaryRow">
+          <span class="muted" style="font-weight:900;">Create your own wheel</span>
+          <span class="chev">⌄</span>
+        </summary>
+
+        <div class="sectionBox">
+          <div class="miniTitle">✨ Make your own Wishlist Wheel</div>
+          <div class="tiny">
+            Fill owner details + items (one per line), click <b>Generate Link</b>, then share it.
+            <br><b>No backend:</b> spin limits + confirmations are per device.
+          </div>
+
+          <div class="grid2">
+            <input id="ownerTitleInput" placeholder="Wheel title (e.g., Akanji’s Christmas Wishlist)" />
+            <input id="ownerWhatsAppInput" placeholder="Owner WhatsApp (optional) e.g. 2348012345678" />
+          </div>
+          <input id="ownerMessageInput" placeholder="Owner message (optional)" />
+
+          <div class="divider"></div>
+          <div class="miniTitle">🏦 Bank Details (optional)</div>
+          <div class="tiny">If blank, it uses the default bank in the code.</div>
+          <div class="grid2">
+            <input id="bankNameInput" placeholder="Bank name (e.g. OPAY)" />
+            <input id="accountNameInput" placeholder="Account name" />
+          </div>
+          <input id="accountNumberInput" placeholder="Account number" />
+
+          <div class="divider"></div>
+          <div class="miniTitle">📝 Items</div>
+          <textarea id="itemsLines" placeholder="Enter items (one per line)
+Example:
+MacBook M3 + Bag
+Funds in bank
+Nike Sneakers"></textarea>
+
+          <div class="row">
+            <button class="btn2" id="generateLinkBtn">Generate Share Link</button>
+            <button class="btn2" id="copyLinkBtn">Copy Link</button>
+          </div>
+          <input id="shareLinkBox" placeholder="Your share link will appear here" readonly />
+          <div class="tiny" style="margin-top:8px;">
+            Tip: include the word <b>Funds</b> in an item name to mark it as a funds gift.
+          </div>
+        </div>
+      </details>
     </div>
 
-    <div class="card">
+    <!-- Right -->
+    <div class="card wheelCard">
       <div class="wheelBox">
         <div class="pointer" aria-hidden="true"></div>
-        <canvas id="wheel" width="900" height="900"></canvas>
+        <canvas id="wheel"></canvas>
+      </div>
+      <div class="tiny wheelHint">Tip: Tap the wheel to spin (mobile).</div>
+    </div>
+  </div>
+
+  <!-- Result Modal -->
+  <div class="modalBackdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalHeader">
+        <div>
+          <div class="modalTitle" id="modalTitle">🎁 Selected Gift</div>
+          <div class="tiny" id="modalSub">This selects a gift for the owner — <b>not</b> a giveaway.</div>
+        </div>
+        <button class="closeX" id="modalCloseBtn">Close ✕</button>
+      </div>
+
+      <div class="modalBody">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <span class="pill" id="modalGiftName">Gift</span>
+          <span class="badge" id="modalGiftType" style="display:none;">Funds</span>
+        </div>
+
+        <div class="hint" style="margin-top:12px;">
+          Share this result so the owner knows what you selected.
+        </div>
+
+        <div class="modalActions">
+          <button class="waBtn" id="waShareBtn">Share to WhatsApp</button>
+          <button class="btn2" id="revealBankBtn">Reveal bank details</button>
+        </div>
+
+        <div class="bankBox" id="bankBox">
+          <div class="miniTitle">💸 Transfer Details</div>
+          <div class="bankGrid">
+            <div class="muted">Bank: <b id="bankNameText"></b></div>
+            <div class="muted">Account Name: <b id="accountNameText"></b></div>
+            <div class="muted">Account No: <b id="accountNumberText"></b></div>
+          </div>
+          <div class="copyRow">
+            <button class="btn2" id="copyAccBtn">Copy Account No</button>
+            <button class="btn2" id="copyAllBtn">Copy Full Details</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="miniTitle">✅ Confirm (optional)</div>
+        <div class="tiny">
+          If you confirm, this gift is marked as “taken” <b>on your device only</b>.
+        </div>
+        <input id="giverName" placeholder="Your name (required)" />
+        <input id="giverMsg" placeholder="Message (optional)" />
+
+        <div class="row">
+          <button class="btn" id="confirmBtn">Confirm I’ll gift this</button>
+          <button class="btn2" id="spinAgainBtn">No, I won’t</button>
+        </div>
+
+        <div class="tiny" style="margin-top:10px; opacity:.82;">
+          Note: Confirmations don’t sync across people (no backend).
+        </div>
       </div>
     </div>
   </div>
 
+  <div class="toast" id="toast"></div>
+
   <script>
+    // ====== Elements ======
     const canvas = document.getElementById("wheel");
     const ctx = canvas.getContext("2d");
-    const jsonBox = document.getElementById("jsonBox");
-    const loadBtn = document.getElementById("loadBtn");
-    const spinBtn = document.getElementById("spinBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const reloadBtn = document.getElementById("reloadBtn");
-    const winnerEl = document.getElementById("winner");
+
+    const pageTitleEl = document.getElementById("pageTitle");
+    const pageSubtitleEl = document.getElementById("pageSubtitle");
     const errEl = document.getElementById("err");
 
-    const RES_KEY = "wishlist_reserved_local_v1";
+    const spinBtn = document.getElementById("spinBtn");
+    const reloadBtn = document.getElementById("reloadBtn");
+    const spinnerNameInput = document.getElementById("spinnerName");
+    const spinStatusEl = document.getElementById("spinStatus");
+    const clearSpinBtn = document.getElementById("clearSpinBtn");
+    const resetReservationsBtn = document.getElementById("resetReservationsBtn");
 
-    function loadReserved() {
-      try { return JSON.parse(localStorage.getItem(RES_KEY) || "{}"); }
-      catch { return {}; }
+    // Create-your-own
+    const ownerTitleInput = document.getElementById("ownerTitleInput");
+    const ownerMessageInput = document.getElementById("ownerMessageInput");
+    const ownerWhatsAppInput = document.getElementById("ownerWhatsAppInput");
+    const bankNameInput = document.getElementById("bankNameInput");
+    const accountNameInput = document.getElementById("accountNameInput");
+    const accountNumberInput = document.getElementById("accountNumberInput");
+    const itemsLines = document.getElementById("itemsLines");
+    const generateLinkBtn = document.getElementById("generateLinkBtn");
+    const copyLinkBtn = document.getElementById("copyLinkBtn");
+    const shareLinkBox = document.getElementById("shareLinkBox");
+
+    // Modal
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const modalCloseBtn = document.getElementById("modalCloseBtn");
+    const modalGiftName = document.getElementById("modalGiftName");
+    const modalGiftType = document.getElementById("modalGiftType");
+    const waShareBtn = document.getElementById("waShareBtn");
+    const revealBankBtn = document.getElementById("revealBankBtn");
+    const bankBox = document.getElementById("bankBox");
+    const bankNameText = document.getElementById("bankNameText");
+    const accountNameText = document.getElementById("accountNameText");
+    const accountNumberText = document.getElementById("accountNumberText");
+    const copyAccBtn = document.getElementById("copyAccBtn");
+    const copyAllBtn = document.getElementById("copyAllBtn");
+    const giverNameInput = document.getElementById("giverName");
+    const giverMsgInput = document.getElementById("giverMsg");
+    const confirmBtn = document.getElementById("confirmBtn");
+    const spinAgainBtn = document.getElementById("spinAgainBtn");
+
+    const toastEl = document.getElementById("toast");
+
+    // ====== Storage keys ======
+    const RES_KEY = "wishlist_reserved_local_v4";
+    const SPIN_KEY = "wishlist_spin_once_v4";
+
+    function loadJSON(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+      catch { return fallback; }
     }
-    function saveReserved(map) {
-      localStorage.setItem(RES_KEY, JSON.stringify(map));
+    function saveJSON(key, obj) {
+      localStorage.setItem(key, JSON.stringify(obj));
     }
     function escapeHtml(s) {
       return String(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     }
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 1200);
+    }
 
-    // ====== BANK SETTINGS ======
-    const BANK_NAME = "OPAY";
-    const ACCOUNT_NAME = "SHODIPO ELIJAH AYOKUNUMI";
-    const ACCOUNT_NUMBER_FULL = "9073504197";
-
+    // ====== Default bank fallback ======
+    const DEFAULT_BANK = {
+      bankName: "OPAY",
+      accountName: "SHODIPO ELIJAH AYOKUNUMI",
+      accountNumber: "9073504197"
+    };
     const SHOW_MASKED_ON_SCREEN = true;
-    const ACCOUNT_NUMBER_DISPLAY = SHOW_MASKED_ON_SCREEN
-      ? ACCOUNT_NUMBER_FULL.replace(/^(\d{2})\d+(\d{2})$/, "$1****$2")
-      : ACCOUNT_NUMBER_FULL;
+    function maskedNumber(full) {
+      if (!SHOW_MASKED_ON_SCREEN) return full;
+      return String(full).replace(/^(\d{2})\d+(\d{2})$/, "$1****$2");
+    }
 
-    // ====== DEFAULT WISHLIST ======
-    const DEFAULT_WISHLIST = [
-      { id: "mac_m3_bag", name: "MacBook M3 + Laptop Bag", type: "item", url: "", price: "" },
-      { id: "s21_ultra", name: "Samsung Galaxy S21 Ultra", type: "item", url: "", price: "" },
-      { id: "funds_ngx", name: "Funds to buy NGX stocks (large amount)", type: "funds", url: "", price: "" },
-      { id: "tees_accessories", name: "Couple of T-shirts + Accessories", type: "item", url: "", price: "" },
-      { id: "jordan_loafers_slide", name: "Jordan Loafers + Nike Slide", type: "item", url: "", price: "" },
-      { id: "baseball_hat", name: "Baseball Hat", type: "item", url: "", price: "" },
-      { id: "funds_bank", name: "Funds in bank", type: "funds", url: "", price: "" }
-    ];
+    // ====== IMMERSIVE: Sound + Haptics ======
+    // Uses WebAudio (no external files). Works after the user interacts (tap/click).
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
 
-    jsonBox.value = JSON.stringify(DEFAULT_WISHLIST, null, 2);
+    function safeVibrate(pattern) {
+      try {
+        if ("vibrate" in navigator) navigator.vibrate(pattern);
+      } catch { }
+    }
 
+    function playTick() {
+      const ac = getAudioCtx();
+      if (ac.state === "suspended") ac.resume().catch(() => { });
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.type = "square";
+      o.frequency.value = 700;
+      g.gain.value = 0.0001;
+
+      o.connect(g); g.connect(ac.destination);
+      const t = ac.currentTime;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.10, t + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+
+      o.start(t);
+      o.stop(t + 0.035);
+    }
+
+    function playWinChime() {
+      const ac = getAudioCtx();
+      if (ac.state === "suspended") ac.resume().catch(() => { });
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.type = "sine";
+      g.gain.value = 0.0001;
+
+      o.connect(g); g.connect(ac.destination);
+      const t = ac.currentTime;
+
+      // little 3-note chime
+      o.frequency.setValueAtTime(523.25, t);        // C5
+      o.frequency.setValueAtTime(659.25, t + 0.08); // E5
+      o.frequency.setValueAtTime(783.99, t + 0.16); // G5
+
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.20, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+
+      o.start(t);
+      o.stop(t + 0.38);
+    }
+
+    // Pointer tick detection (when slice changes)
+    let lastTickIndex = -1;
+    function tickIfNeeded(currentAngle, sliceCount) {
+      if (sliceCount < 2) return;
+      const slice = (Math.PI * 2) / sliceCount;
+      const pointerAngle = (Math.PI * 3) / 2;
+      const normalized = (pointerAngle - (currentAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+      const idx = Math.floor(normalized / slice);
+      if (idx !== lastTickIndex) {
+        lastTickIndex = idx;
+        playTick();
+        // subtle vibration per tick on mobile (very short)
+        safeVibrate(10);
+      }
+    }
+
+    // ====== Wheel config / state ======
+    let wheelConfig = {
+      title: "Akanji’s Christmas Wishlist",
+      message: "Spin to choose what you’ll gift me 🎄",
+      ownerWhatsApp: "",
+      bank: { ...DEFAULT_BANK },
+      items: []
+    };
+    let wheelId = "default";
     let allItems = [];
     let items = [];
     let angle = 0;
     let spinning = false;
+    let lastPicked = null;
+
+    // ====== Canvas sizing ======
+    function resizeCanvas() {
+      const cssSize = Math.min(window.innerWidth * 0.92, 520);
+      const dpr = window.devicePixelRatio || 1;
+      canvas.style.width = cssSize + "px";
+      canvas.style.height = cssSize + "px";
+      canvas.width = Math.floor(cssSize * dpr);
+      canvas.height = Math.floor(cssSize * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawWheel();
+    }
+    window.addEventListener("resize", resizeCanvas);
 
     function randomColor(i) {
       const hue = (i * 47) % 360;
       return `hsl(${hue}, 70%, 55%)`;
     }
+    function normalizeItems(list) {
+      const isFundsName = (name) => /funds|cash|transfer|money/i.test(name);
+      return (list || []).map((x, idx) => ({
+        id: String(x?.id ?? `item_${idx}`).trim() || `item_${idx}`,
+        name: String(x?.name ?? "").trim(),
+        type: String(x?.type ?? (isFundsName(x?.name || "") ? "funds" : "item")).trim()
+      })).filter(x => x.id && x.name).slice(0, 100);
+    }
+
+    function hasAlreadySpunThisWheel() {
+      const spinMap = loadJSON(SPIN_KEY, {});
+      return Boolean(spinMap[wheelId]);
+    }
+    function markSpunThisWheel({ spinnerName, pickedName }) {
+      const spinMap = loadJSON(SPIN_KEY, {});
+      spinMap[wheelId] = { spinnerName, pickedName, at: Date.now() };
+      saveJSON(SPIN_KEY, spinMap);
+    }
+    function clearMySpinThisWheel() {
+      const spinMap = loadJSON(SPIN_KEY, {});
+      delete spinMap[wheelId];
+      saveJSON(SPIN_KEY, spinMap);
+      updateSpinButtonState();
+      toast("Spin reset ✅");
+    }
 
     function rebuildAvailable() {
-      const reserved = loadReserved();
-      items = allItems.filter(it => !reserved[it.id]);
-      spinBtn.disabled = items.length < 2;
+      const reservedAll = loadJSON(RES_KEY, {});
+      const reservedForWheel = reservedAll[wheelId] || {};
+      items = allItems.filter(it => !reservedForWheel[it.id]);
+      updateSpinButtonState();
       drawWheel();
     }
 
+    function updateSpinButtonState() {
+      const nameOk = spinnerNameInput.value.trim().length > 0;
+      const canSpinItems = items.length >= 2;
+      const alreadySpun = hasAlreadySpunThisWheel();
+      spinBtn.disabled = !(nameOk && canSpinItems && !alreadySpun);
+
+      if (!nameOk) {
+        spinStatusEl.textContent = "Enter your name to enable spinning.";
+        return;
+      }
+      if (alreadySpun) {
+        const map = loadJSON(SPIN_KEY, {});
+        const data = map[wheelId];
+        const picked = data?.pickedName ? ` You picked: ${data.pickedName}` : "";
+        spinStatusEl.textContent = "You already spun for this wheel on this device." + picked;
+        return;
+      }
+      if (!canSpinItems) {
+        spinStatusEl.textContent = allItems.length ? "All gifts confirmed on this device ✅" : "Reload list to start.";
+        return;
+      }
+      spinStatusEl.textContent = "Ready. Spin once and share the result to WhatsApp ✅";
+    }
+
+    function setWheelTitleAndSubtitle() {
+      const title = (wheelConfig.title || "Wishlist Wheel").trim();
+      pageTitleEl.textContent = title.startsWith("🎄") ? title : `🎄 ${title}`;
+      const msg = (wheelConfig.message || "").trim();
+      pageSubtitleEl.innerHTML = `
+        ${msg ? escapeHtml(msg) + "<br>" : ""}
+        Spin to select a gift for the owner. This is <b>NOT</b> a giveaway.
+      `;
+    }
+
     function drawWheel() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const radius = Math.min(cx, cy) - 30;
+      const cw = parseFloat(canvas.style.width || "520");
+      const ch = parseFloat(canvas.style.height || "520");
+      const cx = cw / 2, cy = ch / 2;
+      const radius = Math.min(cx, cy) - 18;
+
+      ctx.clearRect(0, 0, cw, ch);
 
       ctx.beginPath();
-      ctx.arc(cx, cy, radius + 10, 0, Math.PI * 2);
+      ctx.arc(cx, cy, radius + 8, 0, Math.PI * 2);
       ctx.fillStyle = "rgba(255,255,255,0.06)";
       ctx.fill();
 
       if (items.length < 2) {
         ctx.fillStyle = "rgba(255,255,255,0.85)";
-        ctx.font = "30px system-ui";
+        ctx.font = "18px system-ui";
         ctx.textAlign = "center";
-        const msg = allItems.length ? "All items reserved ✅" : "Reload list →";
+        const msg = allItems.length ? "All gifts confirmed ✅" : "Reload list →";
         ctx.fillText(msg, cx, cy);
         return;
       }
@@ -320,13 +919,13 @@
         ctx.rotate(start + slice / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "rgba(0,0,0,0.88)";
-        ctx.font = "900 24px system-ui";
-        ctx.fillText(items[i].name.slice(0, 24), radius - 18, 10);
+        ctx.font = "900 16px system-ui";
+        ctx.fillText(items[i].name.slice(0, 26), radius - 14, 8);
         ctx.restore();
       }
 
       ctx.beginPath();
-      ctx.arc(0, 0, 85, 0, Math.PI * 2);
+      ctx.arc(0, 0, 64, 0, Math.PI * 2);
       ctx.fillStyle = "rgba(11,18,32,0.92)";
       ctx.fill();
       ctx.strokeStyle = "rgba(255,255,255,0.18)";
@@ -334,177 +933,160 @@
       ctx.stroke();
 
       ctx.fillStyle = "rgba(255,255,255,0.9)";
-      ctx.font = "900 22px system-ui";
+      ctx.font = "950 16px system-ui";
       ctx.textAlign = "center";
-      ctx.fillText("SPIN", 0, 8);
+      ctx.fillText("SPIN", 0, 6);
 
       ctx.restore();
     }
 
-    function loadJSON(fromTextArea = true) {
-      errEl.textContent = "";
-      winnerEl.innerHTML = "";
-      try {
-        const parsed = fromTextArea ? JSON.parse(jsonBox.value) : DEFAULT_WISHLIST;
-        if (!Array.isArray(parsed)) throw new Error("JSON must be an array.");
-
-        const cleaned = parsed.map((x, idx) => ({
-          id: String(x?.id ?? `item_${idx}`).trim(),
-          name: String(x?.name ?? "").trim(),
-          url: String(x?.url ?? "").trim(),
-          price: String(x?.price ?? "").trim(),
-          type: String(x?.type ?? "item").trim()
-        })).filter(x => x.id && x.name).slice(0, 80);
-
-        if (cleaned.length < 2) throw new Error("Add at least 2 items with id + name.");
-
-        allItems = cleaned;
-        angle = 0;
-        rebuildAvailable();
-      } catch (e) {
-        allItems = [];
-        items = [];
-        spinBtn.disabled = true;
-        drawWheel();
-        errEl.textContent = "Error: " + (e?.message || "Invalid JSON.");
-      }
-    }
-
-    function pickWinner(finalAngle) {
+    function pickSelectedGift(finalAngle) {
       const slice = (Math.PI * 2) / items.length;
       const pointerAngle = (Math.PI * 3) / 2;
       const normalized = (pointerAngle - (finalAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
       return items[Math.floor(normalized / slice)];
     }
 
-    // WhatsApp integration
+    // ====== Modal helpers ======
+    function openModal() {
+      modalBackdrop.classList.add("show");
+      modalBackdrop.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      setTimeout(() => modalCloseBtn.focus(), 0);
+    }
+    function closeModal() {
+      modalBackdrop.classList.remove("show");
+      modalBackdrop.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      bankBox.style.display = "none";
+      revealBankBtn.textContent = "Reveal bank details";
+      giverMsgInput.value = "";
+    }
+    modalCloseBtn.addEventListener("click", closeModal);
+    modalBackdrop.addEventListener("click", (e) => { if (e.target === modalBackdrop) closeModal(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modalBackdrop.classList.contains("show")) closeModal();
+    });
+
+    // ====== WhatsApp ======
     function openWhatsAppShare(text) {
       const url = "https://wa.me/?text=" + encodeURIComponent(text);
       window.open(url, "_blank", "noopener,noreferrer");
     }
-
-    function buildWhatsAppMessage({ itemName, giverName, giverMsg }) {
+    function formatWhatsAppNumber(raw) {
+      return String(raw || "").replace(/\D/g, "");
+    }
+    function buildWhatsAppMessage({ config, itemName, spinnerName, spinnerMsg }) {
+      const bank = config.bank || DEFAULT_BANK;
       const lines = [];
-      lines.push("🎄 *Christmas Wishlist Spin*");
-      lines.push(`🎁 *Result:* ${itemName}`);
+      lines.push(`🎄 *${config.title || "Wishlist Wheel"}*`);
+      if (config.message) lines.push(`📝 ${config.message}`);
       lines.push("");
-      lines.push("💸 *Gift/Transfer Details:*");
-      lines.push(`Bank: ${BANK_NAME}`);
-      lines.push(`Account Name: ${ACCOUNT_NAME}`);
-      lines.push(`Account No: ${ACCOUNT_NUMBER_FULL}`);
-      if (giverName) {
-        lines.push("");
-        lines.push(`✅ *From:* ${giverName}`);
-      }
-      if (giverMsg) {
-        lines.push(`💬 *Message:* ${giverMsg}`);
-      }
+      lines.push(`🎁 *Gift chosen for the owner:* ${itemName}`);
+      lines.push("");
+      lines.push("⚠️ *Not a giveaway.* This is a selection for the owner.");
+      lines.push("");
+      lines.push("💸 *If sending cash/transfer:*");
+      lines.push(`Bank: ${bank.bankName || DEFAULT_BANK.bankName}`);
+      lines.push(`Account Name: ${bank.accountName || DEFAULT_BANK.accountName}`);
+      lines.push(`Account No: ${bank.accountNumber || DEFAULT_BANK.accountNumber}`);
+      if (spinnerName) lines.push(`\n✅ *From:* ${spinnerName}`);
+      if (spinnerMsg) lines.push(`💬 *Message:* ${spinnerMsg}`);
       return lines.join("\n");
     }
 
-    function showConfirmUI(w) {
-      const safeName = escapeHtml(w.name);
-      const isFunds = (w.type === "funds");
+    // ====== Result ======
+    function showResultModal(w) {
+      lastPicked = w;
 
-      winnerEl.innerHTML = `
-      <div style="font-weight:900;font-size:16px;">🎁 Winner: <span class="pill">${safeName}</span></div>
-
-      ${isFunds ? `
-        <div class="muted" style="margin-top:10px;">This one is a <b>Funds gift</b>. You can transfer below.</div>
-      ` : `
-        <div class="muted" style="margin-top:10px;">If you prefer sending cash instead of buying the item, use the bank option.</div>
-      `}
-
-      <!-- ✅ WhatsApp always visible -->
-      <button class="btn2 waBtn" id="waShareBtn" style="margin-top:10px;">Share to WhatsApp</button>
-      <div class="smallNote">Share the result + bank details to WhatsApp.</div>
-
-      <button class="btn2" id="revealBankBtn" style="margin-top:10px;">Reveal bank details</button>
-
-      <div id="bankBox" class="sectionBox" style="display:none;">
-        <div class="miniTitle">💸 Transfer Details</div>
-        <div class="muted">Bank: <b>${escapeHtml(BANK_NAME)}</b></div>
-        <div class="muted">Account Name: <b>${escapeHtml(ACCOUNT_NAME)}</b></div>
-        <div class="muted">Account No: <b>${escapeHtml(ACCOUNT_NUMBER_DISPLAY)}</b></div>
-
-        <div class="row">
-          <button class="btn2" id="copyAccBtn">Copy Account No</button>
-          <button class="btn2" id="copyAllBtn">Copy Full Details</button>
-        </div>
-      </div>
-
-      <div class="muted" style="margin-top:14px;">Confirm to remove it from this wheel on this device:</div>
-      <input id="giverName" placeholder="Your name (required)" />
-      <input id="giverMsg" placeholder="Message (optional)" />
-
-      <button class="btn" id="confirmBtn" style="margin-top:10px;">✅ Confirm I’ll get this</button>
-      <button class="btn2" id="cancelBtn">No, spin again</button>
-    `;
-
-      const revealBtn = document.getElementById("revealBankBtn");
-      const bankBox = document.getElementById("bankBox");
-      if (revealBtn && bankBox) {
-        revealBtn.onclick = () => {
-          bankBox.style.display = (bankBox.style.display === "none") ? "block" : "none";
-        };
+      modalGiftName.textContent = w.name;
+      if (String(w.type).toLowerCase() === "funds") {
+        modalGiftType.style.display = "inline-flex";
+        modalGiftType.textContent = "Funds";
+      } else {
+        modalGiftType.style.display = "none";
       }
 
-      const copyAccBtn = document.getElementById("copyAccBtn");
-      const copyAllBtn = document.getElementById("copyAllBtn");
+      const bank = wheelConfig.bank || DEFAULT_BANK;
+      const bankName = bank.bankName || DEFAULT_BANK.bankName;
+      const accountName = bank.accountName || DEFAULT_BANK.accountName;
+      const accountNumberFull = bank.accountNumber || DEFAULT_BANK.accountNumber;
 
-      if (copyAccBtn) {
-        copyAccBtn.onclick = async () => {
-          await navigator.clipboard.writeText(ACCOUNT_NUMBER_FULL);
-          copyAccBtn.textContent = "Copied ✅";
-          setTimeout(() => copyAccBtn.textContent = "Copy Account No", 1200);
-        };
-      }
+      bankNameText.textContent = bankName;
+      accountNameText.textContent = accountName;
+      accountNumberText.textContent = maskedNumber(accountNumberFull);
 
-      if (copyAllBtn) {
-        copyAllBtn.onclick = async () => {
-          const details = `Bank: ${BANK_NAME}\nAccount Name: ${ACCOUNT_NAME}\nAccount No: ${ACCOUNT_NUMBER_FULL}`;
-          await navigator.clipboard.writeText(details);
-          copyAllBtn.textContent = "Copied ✅";
-          setTimeout(() => copyAllBtn.textContent = "Copy Full Details", 1200);
-        };
-      }
+      giverNameInput.value = spinnerNameInput.value.trim();
 
-      // WhatsApp click handler
-      const waBtn = document.getElementById("waShareBtn");
-      if (waBtn) {
-        waBtn.onclick = () => {
-          const giverName = (document.getElementById("giverName")?.value || "").trim();
-          const giverMsg = (document.getElementById("giverMsg")?.value || "").trim();
-          const msg = buildWhatsAppMessage({ itemName: w.name, giverName, giverMsg });
-          openWhatsAppShare(msg);
-        };
-      }
-
-      document.getElementById("cancelBtn").onclick = () => {
-        winnerEl.innerHTML = "";
-      };
-
-      document.getElementById("confirmBtn").onclick = () => {
-        const name = document.getElementById("giverName").value.trim();
-        const msg = document.getElementById("giverMsg").value.trim();
-        if (!name) { alert("Please enter your name."); return; }
-
-        const reserved = loadReserved();
-        reserved[w.id] = { by: name, msg, at: Date.now() };
-        saveReserved(reserved);
-
-        rebuildAvailable();
-
-        winnerEl.innerHTML = `
-        <div style="font-weight:900;font-size:16px;">✅ Confirmed: <span class="pill">${safeName}</span></div>
-        <div class="muted" style="margin-top:6px;">By <b>${escapeHtml(name)}</b>${msg ? ` — “${escapeHtml(msg)}”` : ""}</div>
-        <div class="muted" style="margin-top:6px;">(Saved on this device)</div>
-      `;
-      };
+      openModal();
     }
 
+    revealBankBtn.addEventListener("click", () => {
+      const isOpen = bankBox.style.display === "block";
+      bankBox.style.display = isOpen ? "none" : "block";
+      revealBankBtn.textContent = isOpen ? "Reveal bank details" : "Hide bank details";
+    });
+
+    copyAccBtn.addEventListener("click", async () => {
+      const bank = wheelConfig.bank || DEFAULT_BANK;
+      const accountNumberFull = bank.accountNumber || DEFAULT_BANK.accountNumber;
+      await navigator.clipboard.writeText(String(accountNumberFull));
+      toast("Account number copied ✅");
+    });
+    copyAllBtn.addEventListener("click", async () => {
+      const bank = wheelConfig.bank || DEFAULT_BANK;
+      const bankName = bank.bankName || DEFAULT_BANK.bankName;
+      const accountName = bank.accountName || DEFAULT_BANK.accountName;
+      const accountNumberFull = bank.accountNumber || DEFAULT_BANK.accountNumber;
+      const details = `Bank: ${bankName}\nAccount Name: ${accountName}\nAccount No: ${accountNumberFull}`;
+      await navigator.clipboard.writeText(details);
+      toast("Bank details copied ✅");
+    });
+
+    waShareBtn.addEventListener("click", () => {
+      if (!lastPicked) return;
+
+      const giverName = giverNameInput.value.trim();
+      const giverMsg = giverMsgInput.value.trim();
+
+      const msg = buildWhatsAppMessage({
+        config: wheelConfig,
+        itemName: lastPicked.name,
+        spinnerName: giverName,
+        spinnerMsg: giverMsg
+      });
+
+      const ownerNum = formatWhatsAppNumber(wheelConfig.ownerWhatsApp);
+      if (ownerNum) {
+        window.open("https://wa.me/" + ownerNum + "?text=" + encodeURIComponent(msg), "_blank", "noopener,noreferrer");
+      } else {
+        openWhatsAppShare(msg);
+      }
+    });
+
+    confirmBtn.addEventListener("click", () => {
+      if (!lastPicked) return;
+
+      const name = giverNameInput.value.trim();
+      const msg = giverMsgInput.value.trim();
+      if (!name) { alert("Please enter your name."); return; }
+
+      const reservedAll = loadJSON(RES_KEY, {});
+      const reservedForWheel = reservedAll[wheelId] || {};
+      reservedForWheel[lastPicked.id] = { by: name, msg, at: Date.now() };
+      reservedAll[wheelId] = reservedForWheel;
+      saveJSON(RES_KEY, reservedAll);
+
+      toast("Confirmed on this device ✅");
+      closeModal();
+      rebuildAvailable();
+    });
+
+    spinAgainBtn.addEventListener("click", () => closeModal());
+
+    // ====== Confetti ======
     function confettiPop() {
-      const n = 120;
+      const n = 110;
       const el = document.createElement("div");
       el.style.position = "fixed";
       el.style.left = "0";
@@ -512,6 +1094,7 @@
       el.style.width = "100%";
       el.style.height = "100%";
       el.style.pointerEvents = "none";
+      el.style.zIndex = "55";
       document.body.appendChild(el);
 
       for (let i = 0; i < n; i++) {
@@ -520,11 +1103,11 @@
         p.style.width = "8px";
         p.style.height = "8px";
         p.style.left = (50 + (Math.random() * 20 - 10)) + "vw";
-        p.style.top = "20vh";
+        p.style.top = "18vh";
         p.style.background = `hsl(${Math.random() * 360}, 80%, 60%)`;
         p.style.transform = `rotate(${Math.random() * 360}deg)`;
         p.style.borderRadius = Math.random() > 0.5 ? "2px" : "999px";
-        p.style.transition = "transform 1.2s ease, top 1.2s ease, left 1.2s ease, opacity 1.2s ease";
+        p.style.transition = "transform 1.1s ease, top 1.1s ease, left 1.1s ease, opacity 1.1s ease";
         el.appendChild(p);
 
         requestAnimationFrame(() => {
@@ -534,55 +1117,264 @@
           p.style.opacity = "0";
         });
       }
-      setTimeout(() => el.remove(), 1400);
+      setTimeout(() => el.remove(), 1250);
     }
 
+    // ====== Spin ======
     function spin() {
-      if (spinning || items.length < 2) return;
+      if (spinning) return;
+      if (hasAlreadySpunThisWheel()) return;
+
+      const spinnerName = spinnerNameInput.value.trim();
+      if (!spinnerName) {
+        alert("Enter your name first.");
+        return;
+      }
+      if (items.length < 2) return;
+
+      // unlock audio on first interaction (mobile browsers requirement)
+      try { getAudioCtx(); } catch { }
+
       spinning = true;
       spinBtn.disabled = true;
-      winnerEl.innerHTML = "";
       errEl.textContent = "";
+      closeModal();
+
+      // immersive kick-off
+      safeVibrate([20, 30, 20]); // start vibration
 
       const spins = 6 + Math.random() * 5;
       const target = angle + spins * Math.PI * 2 + Math.random() * Math.PI * 2;
 
       const start = performance.now();
-      const duration = 4200 + Math.random() * 900;
+      const duration = 3600 + Math.random() * 700;
       const initial = angle;
+
+      // reset tick tracking
+      lastTickIndex = -1;
 
       function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
       function frame(now) {
         const t = Math.min(1, (now - start) / duration);
         angle = initial + (target - initial) * easeOutCubic(t);
+
         drawWheel();
+        tickIfNeeded(angle, items.length); // ✅ ticking sound + micro-haptic
 
         if (t < 1) requestAnimationFrame(frame);
         else {
-          const w = pickWinner(angle);
-          showConfirmUI(w);
+          const w = pickSelectedGift(angle);
+
+          // enforce once-per-wheel on device
+          markSpunThisWheel({ spinnerName, pickedName: w.name });
+
+          // win effects
+          playWinChime();
+          safeVibrate([40, 40, 60]);
           confettiPop();
+          showResultModal(w);
+
           spinning = false;
-          spinBtn.disabled = items.length < 2;
+          updateSpinButtonState();
         }
       }
       requestAnimationFrame(frame);
     }
 
-    // Events
-    resetBtn.addEventListener("click", () => {
-      localStorage.removeItem(RES_KEY);
-      winnerEl.innerHTML = "";
+    // ====== Hash share (wheel config) ======
+    function base64UrlEncode(str) {
+      return btoa(unescape(encodeURIComponent(str)))
+        .replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+    }
+    function base64UrlDecode(str) {
+      const pad = str.length % 4 ? "=".repeat(4 - (str.length % 4)) : "";
+      const b64 = str.replaceAll("-", "+").replaceAll("_", "/") + pad;
+      return decodeURIComponent(escape(atob(b64)));
+    }
+    function getHashDataStr() {
+      const hash = location.hash || "";
+      const m = hash.match(/data=([A-Za-z0-9\-_]+)/);
+      return m ? m[1] : "";
+    }
+    function loadFromHashIfAny() {
+      const dataStr = getHashDataStr();
+      if (!dataStr) return null;
+
+      try {
+        const decoded = base64UrlDecode(dataStr);
+        const payload = JSON.parse(decoded);
+        if (!payload || !Array.isArray(payload.items)) return null;
+
+        return {
+          wheelId: "wheel_" + dataStr,
+          config: {
+            title: String(payload.title || "Wishlist Wheel"),
+            message: String(payload.message || ""),
+            ownerWhatsApp: String(payload.ownerWhatsApp || ""),
+            bank: {
+              bankName: String(payload.bank?.bankName || ""),
+              accountName: String(payload.bank?.accountName || ""),
+              accountNumber: String(payload.bank?.accountNumber || "")
+            },
+            items: payload.items
+          }
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    function loadWheel(config, id) {
+      wheelConfig = {
+        title: config.title || "Wishlist Wheel",
+        message: config.message || "",
+        ownerWhatsApp: config.ownerWhatsApp || "",
+        bank: {
+          bankName: config.bank?.bankName || DEFAULT_BANK.bankName,
+          accountName: config.bank?.accountName || DEFAULT_BANK.accountName,
+          accountNumber: config.bank?.accountNumber || DEFAULT_BANK.accountNumber
+        },
+        items: config.items || []
+      };
+
+      wheelId = id || "default";
+      allItems = normalizeItems(wheelConfig.items);
+      setWheelTitleAndSubtitle();
+
+      if (allItems.length < 2) {
+        errEl.textContent = "Error: Add at least 2 items.";
+        items = [];
+        spinBtn.disabled = true;
+        drawWheel();
+        return;
+      }
+
+      angle = 0;
       rebuildAvailable();
+    }
+
+    // ====== Create-your-own wheel ======
+    function linesToItems(linesText) {
+      const lines = (linesText || "")
+        .split("\n")
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      return lines.map((name, idx) => ({
+        id: "i_" + idx + "_" + name.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 24),
+        name
+      }));
+    }
+
+    function buildShareLinkFromForm() {
+      const title = ownerTitleInput.value.trim() || "Wishlist Wheel";
+      const message = ownerMessageInput.value.trim() || "";
+      const ownerWhatsApp = ownerWhatsAppInput.value.trim() || "";
+
+      const items = linesToItems(itemsLines.value);
+      if (items.length < 2) {
+        alert("Please enter at least 2 items (one per line).");
+        return null;
+      }
+
+      const payload = {
+        title,
+        message,
+        ownerWhatsApp,
+        bank: {
+          bankName: bankNameInput.value.trim(),
+          accountName: accountNameInput.value.trim(),
+          accountNumber: accountNumberInput.value.trim()
+        },
+        items
+      };
+
+      const encoded = base64UrlEncode(JSON.stringify(payload));
+      const url = location.origin + location.pathname + "#data=" + encoded;
+      return { url, payload, wheelId: "wheel_" + encoded };
+    }
+
+    generateLinkBtn.addEventListener("click", () => {
+      const built = buildShareLinkFromForm();
+      if (!built) return;
+
+      shareLinkBox.value = built.url;
+      loadWheel(built.payload, built.wheelId);
+
+      toast("Link generated ✅");
+      updateSpinButtonState();
     });
-    loadBtn.addEventListener("click", () => loadJSON(true));
-    reloadBtn.addEventListener("click", () => loadJSON(false));
+
+    copyLinkBtn.addEventListener("click", async () => {
+      if (!shareLinkBox.value.trim()) {
+        alert("Generate the link first.");
+        return;
+      }
+      await navigator.clipboard.writeText(shareLinkBox.value.trim());
+      toast("Link copied ✅");
+    });
+
+    // ====== Events ======
+    spinnerNameInput.addEventListener("input", updateSpinButtonState);
     spinBtn.addEventListener("click", spin);
 
-    // Start
-    drawWheel();
-    loadJSON(false);
+    // Tap wheel to spin on mobile
+    canvas.addEventListener("click", spin);
+    canvas.addEventListener("touchend", (e) => { e.preventDefault(); spin(); }, { passive: false });
+
+    reloadBtn.addEventListener("click", () => { rebuildAvailable(); toast("Reloaded ✅"); });
+
+    resetReservationsBtn.addEventListener("click", () => {
+      const reservedAll = loadJSON(RES_KEY, {});
+      delete reservedAll[wheelId];
+      saveJSON(RES_KEY, reservedAll);
+      rebuildAvailable();
+      toast("Reservations reset ✅");
+    });
+
+    clearSpinBtn.addEventListener("click", () => { clearMySpinThisWheel(); closeModal(); });
+
+    // ====== Boot ======
+    resizeCanvas();
+
+    const fromHash = loadFromHashIfAny();
+    if (fromHash) {
+      loadWheel(fromHash.config, fromHash.wheelId);
+
+      // Prefill creator fields (nice-to-have)
+      ownerTitleInput.value = fromHash.config.title || "";
+      ownerMessageInput.value = fromHash.config.message || "";
+      ownerWhatsAppInput.value = fromHash.config.ownerWhatsApp || "";
+      bankNameInput.value = (fromHash.config.bank?.bankName && fromHash.config.bank.bankName !== DEFAULT_BANK.bankName) ? fromHash.config.bank.bankName : "";
+      accountNameInput.value = (fromHash.config.bank?.accountName && fromHash.config.bank.accountName !== DEFAULT_BANK.accountName) ? fromHash.config.bank.accountName : "";
+      accountNumberInput.value = (fromHash.config.bank?.accountNumber && fromHash.config.bank.accountNumber !== DEFAULT_BANK.accountNumber) ? fromHash.config.bank.accountNumber : "";
+      itemsLines.value = (fromHash.config.items || []).map(x => x.name).join("\n");
+      shareLinkBox.value = location.href;
+    } else {
+      const DEFAULT_CONFIG = {
+        title: "Akanji’s Christmas Wishlist",
+        message: "Spin to choose what you’ll gift me 🎄",
+        ownerWhatsApp: "", // optional: 23480xxxxxxxxxx to receive direct messages
+        bank: { ...DEFAULT_BANK },
+        items: [
+          { id: "mac_m3_bag", name: "A new Mac M3 with a laptop bag", type: "item" },
+          { id: "s21_ultra", name: "A new Samsung S21 Ultra", type: "item" },
+          { id: "funds_ngx", name: "Funds to buy NGX in large amount", type: "funds" },
+          { id: "tees_accessories", name: "A couple of t-shirt and accessories", type: "item" },
+          { id: "jordan_nike", name: "A Jordan loafers and a Nike slide", type: "item" },
+          { id: "baseball_hat", name: "A baseball hat", type: "item" },
+          { id: "funds_bank", name: "Funds in bank", type: "funds" }
+        ]
+      };
+      loadWheel(DEFAULT_CONFIG, "default");
+
+      ownerTitleInput.value = DEFAULT_CONFIG.title;
+      ownerMessageInput.value = DEFAULT_CONFIG.message;
+      itemsLines.value = DEFAULT_CONFIG.items.map(x => x.name).join("\n");
+    }
+
+    updateSpinButtonState();
   </script>
 </body>
 
